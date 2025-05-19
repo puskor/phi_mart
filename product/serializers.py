@@ -25,10 +25,15 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ["id","name","stock","category","price","tax_with_price"]
         
     tax_with_price=serializers.SerializerMethodField(method_name="calculate_tax")
-    category = serializers.HyperlinkedRelatedField(queryset = Category.objects.all(),view_name="specific_category")
-
+    # category = serializers.HyperlinkedRelatedField(queryset = Category.objects.all(),view_name="specific_category")
     def calculate_tax(self,product):
         return round(product.price * Decimal(1.1),2)
+    def validate_price(self,price):
+        if price < 0:
+            raise serializers.ValidationError("Price must me positive")
+        return price
+
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
